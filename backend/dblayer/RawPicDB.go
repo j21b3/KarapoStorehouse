@@ -13,6 +13,7 @@ import (
 type RawPic struct {
 	Id         primitive.ObjectID `bson:"_id"`
 	Title      string             `bson:"title"`
+	FileName   string             `bson:"file_name"`
 	Data       []byte             `bson:"data"`
 	Uploader   int                `bson:"uploader"`
 	Message    string             `bson:"message"`

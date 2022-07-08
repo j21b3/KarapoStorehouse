@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"time"
+
+	"github.com/disintegration/imaging"
 )
 
 // Compress byte data using gzip compression
@@ -44,4 +46,29 @@ func UnCompressPic(data []byte) ([]byte, error) {
 	}
 
 	return decodebuf.Bytes(), nil
+}
+
+/**
+* 生成图片略缩图
+ */
+func GenerateThumbnail(data []byte, width, height int) ([]byte, error) {
+	buf := bytes.NewBuffer(data)
+	image, err := imaging.Decode(buf)
+	if err != nil {
+		return nil, err
+	}
+	image = imaging.Thumbnail(image, width, height, imaging.NearestNeighbor)
+	/* {
+		err = imaging.Save(image, "test.jpg")
+		if err != nil {
+			return nil, err
+		}
+	} */
+	thumbnailBuf := bytes.Buffer{}
+	err = imaging.Encode(&thumbnailBuf, image, imaging.JPEG)
+	if err != nil {
+		return nil, err
+	}
+
+	return thumbnailBuf.Bytes(), nil
 }

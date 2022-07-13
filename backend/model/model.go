@@ -1,4 +1,4 @@
-package datalayer
+package model
 
 type PicData struct {
 	Title    string   `json:"title"`

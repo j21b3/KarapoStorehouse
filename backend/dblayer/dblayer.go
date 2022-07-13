@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type RawPic struct {
@@ -25,7 +26,14 @@ type RawPicDBController struct {
 	*mongo.Collection
 }
 
-func NewRawPicDBController(client *mongo.Client) *RawPicDBController {
+func NewRawPicDBController(mongodbURL string) *RawPicDBController {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongodbURL))
+	if err != nil {
+		panic(err)
+	}
+
 	var c RawPicDBController
 	c.Collection = client.Database("KarapoStorehouse").Collection("RawPic")
 	if c.Collection == nil {
@@ -83,4 +91,8 @@ func (c *RawPicDBController) FindPicById(ctx context.Context, HexIDStr string) (
 		return nil, err
 	}
 	return &ret, nil
+}
+
+func (c *RawPicDBController) GenerateID() primitive.ObjectID {
+	return primitive.NewObjectID()
 }

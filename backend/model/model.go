@@ -9,7 +9,7 @@ type PicData struct {
 	Tags     []string `json:"tags"`
 }
 
-type ReturnDara struct {
+type ReturnData struct {
 	Data   []byte `json:"data"`
 	Status bool   `json:"status"`
 	Err    string `json:"err"`

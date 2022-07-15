@@ -2,9 +2,9 @@ package model
 
 type PicData struct {
 	Title    string   `json:"title"`
-	FileName string   `json:"file_name"`
-	Data     []byte   `json:"data"`
-	Uploader int      `json:"uploader"`
+	FileName string   `json:"file_name" binding:"required"`
+	Data     []byte   `json:"data" binding:"required"`
+	Uploader int      `json:"uploader" binding:"required"`
 	Message  string   `json:"message"`
 	Tags     []string `json:"tags"`
 }

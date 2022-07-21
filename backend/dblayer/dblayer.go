@@ -3,6 +3,7 @@ package dblayer
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -95,4 +96,36 @@ func (c *RawPicDBController) FindPicById(ctx context.Context, HexIDStr string) (
 
 func (c *RawPicDBController) GenerateID() primitive.ObjectID {
 	return primitive.NewObjectID()
+}
+
+// 按照时间从近到远按页进行查找 返回图片的ID切片, PageNum从1开始计数 Limit固定为20
+// 只要ctx不变化，就可以视作同一事务
+func (c *RawPicDBController) GetTimelineID(ctx context.Context, PageNum int64) ([]string, error) {
+	findoption := options.FindOptions{}
+	Limit := int64(20)
+	if PageNum > 0 {
+		findoption.SetLimit(Limit)
+		findoption.SetSkip(Limit * (PageNum - 1))
+	}
+	findoption.SetSort(bson.D{{"create_time", -1}})
+
+	cur, err := c.Find(ctx, bson.D{}, &findoption)
+	if err != nil {
+		return nil, err
+	}
+
+	var document []bson.M
+	if err := cur.All(ctx, &document); err != nil {
+		return nil, err
+	}
+
+	ret := []string{}
+	for _, each := range document {
+		fmt.Printf("%T\n", each["_id"])
+		t := each["_id"]
+		val := reflect.ValueOf(t)
+		f := val.MethodByName("Hex")
+		ret = append(ret, f.Call([]reflect.Value{})[0].String())
+	}
+	return ret, nil
 }

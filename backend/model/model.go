@@ -10,7 +10,7 @@ type PicData struct {
 }
 
 type ReturnData struct {
-	Data   []byte `json:"data"`
-	Status bool   `json:"status"`
-	Err    string `json:"err"`
+	Data   interface{} `json:"data"`
+	Status bool        `json:"status"`
+	Err    string      `json:"err"`
 }

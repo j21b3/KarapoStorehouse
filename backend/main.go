@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// 现版本先只用一个会话连接数据库，后续更新用户管理后每个用户都分配一个
 var RPC *dblayer.RawPicDBController
 
 func main() {
@@ -31,7 +32,7 @@ func SetRoutes(Eng *gin.Engine) {
 		rawpic.GET("/thumbnail", GetThumbnailPic)
 	}
 	Eng.POST("/upload", UploadRawPic)
-
+	Eng.GET("/timeline/:page", GetTimeline)
 }
 
 // GET http://127.0.0.1:25790/raw/{picid} 获取原图片
@@ -149,4 +150,35 @@ func GetThumbnailPic(c *gin.Context) {
 	}
 	//TODO:后续需要调整为协议内容
 	c.Writer.WriteString(string(thumbnailData))
+}
+
+// GET http://127.0.0.1:25790/timeline/(0,int64max)
+func GetTimeline(c *gin.Context) {
+	pageStr := c.Param("page")
+	page, err := strconv.ParseInt(pageStr, 10, 64)
+	if err != nil || page <= 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, model.ReturnData{
+			Status: false,
+			Err:    "ERROR input param for timeline",
+			Data:   nil,
+		})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	ret, err := RPC.GetTimelineID(ctx, page)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, model.ReturnData{
+			Status: false,
+			Err:    "ERROR generate timeline",
+			Data:   nil,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, model.ReturnData{
+		Status: true,
+		Data:   ret,
+	})
 }

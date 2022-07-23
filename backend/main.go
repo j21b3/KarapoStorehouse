@@ -6,10 +6,11 @@ import (
 	"strconv"
 	"time"
 
-	"backend.main/dblayer"
+	"KarapoStorehouse/backend/dblayer"
 
-	"backend.main/model"
-	"backend.main/tools"
+	"KarapoStorehouse/model"
+
+	"KarapoStorehouse/tools"
 
 	"github.com/gin-gonic/gin"
 )

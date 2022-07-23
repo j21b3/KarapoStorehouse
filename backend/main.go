@@ -53,7 +53,14 @@ func GetRawPic(c *gin.Context) {
 	}
 
 	//TODO:后续需要调整为协议内容
-	c.Writer.WriteString(string(data.Data))
+	//c.Writer.WriteString(string(data.Data))
+	c.JSON(
+		http.StatusOK,
+		model.ReturnData{
+			Status: true,
+			Data:   data,
+		}
+	)
 }
 
 // POST http://ip:25790/upload 上传原图片

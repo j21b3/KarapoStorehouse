@@ -1,12 +1,15 @@
 package trans
 
 import (
+	"KarapoStorehouse/model"
+	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
-	"KarapoStorehouse/model"
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/widget"
 )
 
 var RawPicURL = "raw/%s"
@@ -19,6 +22,16 @@ type Backend struct {
 	Key    []byte
 }
 
+type ShowImage struct {
+	Title    string
+	FileName string
+	Uploader int
+	Message  string
+
+	Image  *canvas.Image
+	Lables map[string]*widget.Label
+}
+
 func NewBackend(ip string, port int) *Backend {
 	return &Backend{
 		Ip:   ip,
@@ -27,7 +40,7 @@ func NewBackend(ip string, port int) *Backend {
 }
 
 // 获取原图片的接口封装
-func (b *Backend) GetRawPic(idhex string) (*model.PicData, error) {
+func (b *Backend) GetRawPic(idhex string) (*ShowImage, error) {
 	resp, err := http.Get(fmt.Sprintf("http://%s:%d/"+RawPicURL, b.Ip, b.Port, idhex))
 	if err != nil {
 		return nil, err
@@ -35,16 +48,48 @@ func (b *Backend) GetRawPic(idhex string) (*model.PicData, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New(fmt.Sprintf("Bad response from server: %d", resp.StatusCode))
+		return nil, fmt.Errorf("bad response from server: %d", resp.StatusCode)
 	}
 
-	var buf []byte
-	if _, err := resp.Body.Read(buf); err != nil {
-		return nil, errors.New(fmt.Sprintf("Bad reply data from server (Body Read)"))
+	buf, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
-	var picdata model.PicData
-	if err := json.Unmarshal(buf, &picdata); err != nil {
-		return nil, errors.New(fmt.Sprintf("Bad reply data from server (Json Unmarshal)"))
+
+	var retdata struct {
+		Data   model.PicData `json:"data"`
+		Status bool          `json:"status"`
+		Err    string        `json:"err"`
 	}
-	return &picdata, nil
+
+	if err := json.Unmarshal(buf, &retdata); err != nil {
+		return nil, err
+	}
+
+	if !retdata.Status {
+		return nil, fmt.Errorf("return error, status is false")
+	}
+
+	picdata := &retdata.Data
+
+	showimage := ShowImage{
+		Title:    picdata.Title,
+		Message:  picdata.Message,
+		FileName: picdata.FileName,
+		Uploader: picdata.Uploader,
+		Lables:   make(map[string]*widget.Label),
+	}
+
+	readbuf := bytes.NewBuffer(picdata.Data)
+
+	showimage.Image = canvas.NewImageFromReader(readbuf, picdata.FileName)
+	if showimage.Image == nil {
+		return nil, fmt.Errorf("bad reply data from server (newimagefromimage)")
+	}
+	showimage.Image.FillMode = canvas.ImageFillOriginal
+
+	for _, each := range picdata.Tags {
+		showimage.Lables[each] = widget.NewLabel(each)
+	}
+	return &showimage, nil
 }

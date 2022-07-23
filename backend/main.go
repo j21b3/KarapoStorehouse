@@ -59,8 +59,7 @@ func GetRawPic(c *gin.Context) {
 		model.ReturnData{
 			Status: true,
 			Data:   data,
-		}
-	)
+		})
 }
 
 // POST http://ip:25790/upload 上传原图片
@@ -156,7 +155,11 @@ func GetThumbnailPic(c *gin.Context) {
 		return
 	}
 	//TODO:后续需要调整为协议内容
-	c.Writer.WriteString(string(thumbnailData))
+	//c.Writer.WriteString(string(thumbnailData))
+	c.JSON(http.StatusOK, model.ReturnData{
+		Status: true,
+		Data:   thumbnailData,
+	})
 }
 
 // GET http://127.0.0.1:25790/timeline/(0,int64max)

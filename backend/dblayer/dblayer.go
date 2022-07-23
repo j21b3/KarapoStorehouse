@@ -105,7 +105,7 @@ func (c *RawPicDBController) GetTimelineID(ctx context.Context, PageNum int64) (
 		findoption.SetLimit(Limit)
 		findoption.SetSkip(Limit * (PageNum - 1))
 	}
-	findoption.SetSort(bson.D{{"create_time", -1}})
+	findoption.SetSort(bson.D{{Key: "create_time", Value: -1}})
 
 	cur, err := c.Find(ctx, bson.D{}, &findoption)
 	if err != nil {

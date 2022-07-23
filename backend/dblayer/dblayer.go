@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"time"
 
+	"backend.main/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,13 +15,9 @@ import (
 
 type RawPic struct {
 	Id         primitive.ObjectID `bson:"_id"`
-	Title      string             `bson:"title"`
-	FileName   string             `bson:"file_name"`
-	Data       []byte             `bson:"data"`
-	Uploader   int                `bson:"uploader"`
-	Message    string             `bson:"message"`
 	CreateTime time.Time          `bson:"create_time"`
-	Tags       []string           `bson:"tags"`
+
+	model.PicData
 }
 
 type RawPicDBController struct {

@@ -58,7 +58,7 @@ func GetRawPic(c *gin.Context) {
 		http.StatusOK,
 		model.ReturnData{
 			Status: true,
-			Data:   data,
+			Data:   data.PicData,
 		})
 }
 
@@ -79,13 +79,15 @@ func UploadRawPic(c *gin.Context) {
 	id := RPC.GenerateID()
 	err := RPC.InsertPic(ctx, dblayer.RawPic{
 		Id:         id,
-		Title:      data.Title,
-		FileName:   data.FileName,
-		Data:       data.Data,
-		Uploader:   data.Uploader,
-		Message:    data.Message,
 		CreateTime: time.Now(),
-		Tags:       data.Tags,
+		PicData: model.PicData{
+			Title:    data.Title,
+			FileName: data.FileName,
+			Data:     data.Data,
+			Uploader: data.Uploader,
+			Message:  data.Message,
+			Tags:     data.Tags,
+		},
 	})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, model.ReturnData{

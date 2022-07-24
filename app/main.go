@@ -19,6 +19,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+
 	/* f, err := os.Open("D:/MyProject/gopath/src/KarapoStorehouse/backend/illust_63093148_20210101_095841.jpg")
 	if err != nil {
 		fmt.Println(err)

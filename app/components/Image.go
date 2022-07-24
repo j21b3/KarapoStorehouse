@@ -6,17 +6,16 @@ import (
 	"fmt"
 
 	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/widget"
 )
 
 type ShowImage struct {
-	Title    string
+	Title    string `json:"title"`
 	FileName string
-	Uploader int
-	Message  string
+	Uploader string `json:"uploader"`
+	Message  string `json:"message"`
 
 	Image  *canvas.Image
-	Lables map[string]*widget.Label
+	Lables []string `json:"tags"`
 }
 
 type RetPic struct {
@@ -33,7 +32,7 @@ func NewShowImage(picdata *model.PicData) (*ShowImage, error) {
 		Message:  picdata.Message,
 		FileName: picdata.FileName,
 		Uploader: picdata.Uploader,
-		Lables:   make(map[string]*widget.Label),
+		Lables:   picdata.Tags,
 	}
 
 	readbuf := bytes.NewBuffer(picdata.Data)
@@ -44,8 +43,5 @@ func NewShowImage(picdata *model.PicData) (*ShowImage, error) {
 	}
 	showimage.Image.FillMode = canvas.ImageFillContain
 
-	for _, each := range picdata.Tags {
-		showimage.Lables[each] = widget.NewLabel(each)
-	}
 	return &showimage, nil
 }

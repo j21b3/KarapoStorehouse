@@ -1,7 +1,6 @@
 package trans
 
 import (
-	"KarapoStorehouse/app/components"
 	"KarapoStorehouse/model"
 	"encoding/json"
 	"fmt"
@@ -33,7 +32,7 @@ type RetPic struct {
 }
 
 // 获取原图片的接口封装
-func (b *Backend) GetRawPic(idhex string) (*components.ShowImage, error) {
+func (b *Backend) GetRawPic(idhex string) (*model.PicData, error) {
 	resp, err := http.Get(fmt.Sprintf("http://%s:%d/"+RawPicURL, b.Ip, b.Port, idhex))
 	if err != nil {
 		return nil, err
@@ -60,5 +59,5 @@ func (b *Backend) GetRawPic(idhex string) (*components.ShowImage, error) {
 		return nil, fmt.Errorf("return error, status is false")
 	}
 
-	return components.NewShowImage(&retpic.Data)
+	return &retpic.Data, nil
 }

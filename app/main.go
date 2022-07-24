@@ -2,8 +2,6 @@ package main
 
 import (
 	"KarapoStorehouse/app/components"
-	"KarapoStorehouse/app/trans"
-	"fmt"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -14,13 +12,6 @@ func main() {
 	// a.SetIcon()
 
 	w := myapp.NewWindow("图片显示测试")
-
-	backend := trans.NewBackend("127.0.0.1", 25790)
-	img, err := backend.GetRawPic("62dbd0d283d5641480925801")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
 
 	/* f, err := os.Open("D:/MyProject/gopath/src/KarapoStorehouse/backend/illust_63093148_20210101_095841.jpg")
 	if err != nil {
@@ -38,8 +29,8 @@ func main() {
 	img.FillMode = canvas.ImageFillOriginal
 	*/
 
-	page := components.NewImagePage(img)
-	w.Resize(fyne.Size{Width: 500, Height: 200})
+	page := components.NewImagePage("62dbd0d283d5641480925801")
+	w.Resize(fyne.Size{Width: 1000, Height: 1000})
 	w.SetContent(page)
 
 	w.ShowAndRun()

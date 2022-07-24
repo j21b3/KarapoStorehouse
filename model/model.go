@@ -4,7 +4,7 @@ type PicData struct {
 	Title    string   `json:"title" bson:"title"`
 	FileName string   `json:"file_name" binding:"required" bson:"file_name"`
 	Data     []byte   `json:"data" binding:"required" bson:"data"`
-	Uploader int      `json:"uploader" binding:"required" bson:"uploader"`
+	Uploader string   `json:"uploader" binding:"required" bson:"uploader"`
 	Message  string   `json:"message" bson:"message"`
 	Tags     []string `json:"tags" bson:"tags"`
 }

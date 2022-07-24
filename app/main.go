@@ -1,9 +1,11 @@
 package main
 
 import (
+	"KarapoStorehouse/app/components"
 	"KarapoStorehouse/app/trans"
 	"fmt"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 )
 
@@ -35,7 +37,10 @@ func main() {
 	img := canvas.NewImageFromImage(imgd)
 	img.FillMode = canvas.ImageFillOriginal
 	*/
-	w.SetContent(img.Image)
+
+	page := components.NewImagePage(img)
+	w.Resize(fyne.Size{Width: 500, Height: 200})
+	w.SetContent(page)
 
 	w.ShowAndRun()
 }

@@ -42,7 +42,7 @@ func NewShowImage(picdata *model.PicData) (*ShowImage, error) {
 	if showimage.Image == nil {
 		return nil, fmt.Errorf("bad reply data from server (newimagefromimage)")
 	}
-	showimage.Image.FillMode = canvas.ImageFillOriginal
+	showimage.Image.FillMode = canvas.ImageFillContain
 
 	for _, each := range picdata.Tags {
 		showimage.Lables[each] = widget.NewLabel(each)

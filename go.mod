@@ -3,7 +3,6 @@ module KarapoStorehouse
 go 1.18
 
 require (
-	fyne.io/fyne v1.4.3
 	fyne.io/fyne/v2 v2.2.3
 	github.com/disintegration/imaging v1.6.2
 	github.com/gin-gonic/gin v1.8.1

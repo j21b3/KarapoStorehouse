@@ -134,8 +134,8 @@ func GetThumbnailPic(c *gin.Context) {
 
 	var thumbnailData []byte
 	if form.Width == "" {
-		//默认为1000*1000的正方形
-		thumbnailData, err = tools.GenerateThumbnail(data.Data, 1000, 1000)
+		//默认为360*360的正方形
+		thumbnailData, err = tools.GenerateThumbnail(data.Data, 360, 360)
 	} else {
 		var wid int64
 		if wid, err = strconv.ParseInt(form.Width, 10, 32); err != nil {

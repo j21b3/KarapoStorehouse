@@ -2,67 +2,185 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Vue 测试实例 - 菜鸟教程(runoob.com)</title>
-<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
-<script src="https://cdn.staticfile.org/axios/0.18.0/axios.min.js"></script>
+<title>图片显示测试</title>
+
 </head>
-<body>
-<div id="testPic">
-  <h1>网站列表</h1>
-  <h2>{{ title }}</h2>
-  <h2>{{ filename }}</h2>
-  <h2>{{ message }}</h2>
-  <h2>{{ tags }}</h2>
-  <h2>{{ uploader }}</h2>
-  <img :src="data" alt="this is a test">
-</div>
-<script type = "text/javascript">
+<body style="background-color: #BAD7DF;	min-width: 1160px; ">
+	
 
-new Vue({
-	  el: '#testPic',
-	  data :{    
-		
-		title:"",
-		filename:"",
-		message:"",
-		tags:[],
-		uploader:"",
-		data:null,
-	  },
-	  mounted () {
-	    axios
-	      .get("http://127.0.0.1:25790/raw/62dbd0d283d5641480925801")
-	      .then(response => {
-				if (response.data.status){
-					console.log("获取图片成功")
-					//由于有filename，就根据filename的文件类型来选择解码方式，demo中固定用jpg
-					this.title=response.data.data.title
-					this.filename=response.data.data.filename
-					this.message=response.data.data.message
-					this.tags=response.data.data.tags
-					this.uploader=response.data.data.uploader
-					//this.data=response.data.data.data
-					
-					/*
-					let base64String = btoa(
-					            String.fromCharCode.apply(null, new Uint8Array(response.data.data.data))
-					          );
-							  */
-					this.data = "data:image/jpg;base64," + response.data.data.data
-					//console.log(base64String)
-					//console.log(this.data)
+	<div id="testPic" v-bind:class="'ShowBox'">
+	  
+		<div v-bind:class="'imageShowBox'">
+			<img :src="data" alt="this is a test" v-bind:class="'image'">
+		</div>
+	  
+		<aside v-bind:class="'SideShowBox'">
+			<div v-bind:class="'UserBox'">
+				网站列表<br />
+				{{ title }}<br />
+				{{ filename }}<br />
+				{{ message }}<br />
+				{{ tags }}<br />
+				{{ uploader }}<br />
+				
+			</div>
 			
-				}else{
-					console.log("获取失败"+response.data.err)
-				}
-			})
-	      .catch(function (error) { // 请求失败处理
-	        console.log(error);
-	      });
-	  }
-})
+		  <div v-bind:class="'buttonBox'">
+			  这里是按钮盒子
+		  </div>
+		</aside>
+		
+	  
+	</div>
 
-</script>
+	<script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+	<script src="https://cdn.staticfile.org/axios/0.18.0/axios.min.js"></script>
+	<script type = "text/javascript">
+
+	new Vue({
+		  el: '#testPic',
+		  data :{    
+			
+			title:"",
+			filename:"",
+			message:"",
+			tags:[],
+			uploader:"",
+			data:null,
+		  },
+		  mounted () {
+			axios
+			  .get("http://127.0.0.1:25790/raw/62e8e95446b76ab6631787b3")
+			  // .get("http://127.0.0.1:25790/raw/62dbd0d283d5641480925801")
+			  .then(response => {
+					if (response.data.status){
+						console.log("获取图片成功")
+						//由于有filename，就根据filename的文件类型来选择解码方式，demo中固定用jpg
+						this.title=response.data.data.title
+						this.filename=response.data.data.filename
+						this.message=response.data.data.message
+						this.tags=response.data.data.tags
+						this.uploader=response.data.data.uploader
+						//this.data=response.data.data.data
+						
+						/*
+						let base64String = btoa(
+									String.fromCharCode.apply(null, new Uint8Array(response.data.data.data))
+								  );
+								  */
+						this.data = "data:image/jpg;base64," + response.data.data.data
+						//console.log(base64String)
+						//console.log(this.data)
+				
+					}else{
+						console.log("获取失败"+response.data.err)
+					}
+				})
+			  .catch(function (error) { // 请求失败处理
+				console.log(error);
+			  });
+		  }
+	})
+
+	</script>
 </body>
 </html>
+<style>
+	.ShowBox{
+		padding: 0px 72px;
+		margin: 8px 8px 8px 8px;
+		
 
+		display: flex;
+		padding-bottom: 12px;
+		padding-left: 12px;
+		padding-right: 12px;
+		padding-top: 12px;
+		max-width: 100%;
+		max-height: 100%;
+		
+		background-color: #ffe2e2;
+		
+		border-radius: 30px;
+		
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		
+		
+	}
+	
+	.image{
+		width: 100%;
+		height: 100%;
+
+
+		justify-content: center;
+		object-fit: contain;
+		
+		
+	}
+	
+	.imageShowBox{
+
+		display: flex;
+		justify-content: center;
+		
+		width: 100%;
+		height: 100%;
+		min-width: 200px;
+		/* min-height: 480px; */
+		margin-right: 6px;
+		max-width: calc(100% - 12px);
+		max-height: calc(100%);
+		
+		padding-bottom: 0px;
+		position: relative;
+		border-radius: 20px;
+
+	}
+	
+	.SideShowBox{
+		margin-left: 6px;
+		margin-bottom: ;
+		width: 288px;
+		
+		
+		position: relative;
+		
+		margin-bottom: 2px;
+		
+		border-radius: 20px;
+	}
+	
+	.UserBox{
+		
+		width: 288px;
+		height: calc(62.5% - 6px);
+		flex: 0 0 auto;	
+		background-color: #F6F6F6;
+		
+		margin-bottom: 6px;
+
+		
+		
+		border-radius: 20px;
+	}
+	
+	.buttonBox{
+		
+		width: 288px;
+		height: 37.5%;
+		flex: 0 0 auto;	
+		background-color: #F6F6F6;
+		margin-top: 2%;
+		margin-bottom: 0px;
+		
+		
+		position: absolute; bottom: 0px;
+		
+		border-radius: 20px;
+	}
+</style>

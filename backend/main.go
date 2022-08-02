@@ -12,6 +12,7 @@ import (
 
 	"KarapoStorehouse/tools"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,6 +23,7 @@ func main() {
 	Eng := gin.Default()
 
 	RPC = dblayer.NewRawPicDBController("mongodb://localhost:27017")
+	SetMiddleware(Eng)
 	SetRoutes(Eng)
 	Eng.Run(":25790")
 }
@@ -194,4 +196,9 @@ func GetTimeline(c *gin.Context) {
 		Status: true,
 		Data:   ret,
 	})
+}
+
+func SetMiddleware(Eng *gin.Engine) {
+	// 解决跨域访问，default允许所有的origins，后续视情况修改
+	Eng.Use(cors.Default())
 }

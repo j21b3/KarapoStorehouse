@@ -5,7 +5,7 @@
 <title>图片显示测试</title>
 
 </head>
-<body style="background-color: #BAD7DF;	min-width: 1160px; ">
+<body style="background-color: #132C33;	min-width: 1160px; ">
 	
 
 	<div id="testPic" v-bind:class="'ShowBox'">
@@ -15,19 +15,34 @@
 		</div>
 	  
 		<aside v-bind:class="'SideShowBox'">
-			<div v-bind:class="'UserBox'">
-				网站列表<br />
-				{{ title }}<br />
-				{{ filename }}<br />
-				{{ message }}<br />
-				{{ tags }}<br />
-				{{ uploader }}<br />
+			<div v-bind:class="'floatBox'">
 				
+				<div v-bind:class="'UserBox'">
+					<div v-bind:class="'TextBox'">
+						<h1 v-bind:class="'PicUploader'">上传者：{{ uploader }}</h1>
+						<h4>{{ title }}</h4>
+						
+						<p v-bind:class="'PicMessage'">{{ message }}</p>
+						<ul v-bind:class="'TagsBox'">
+							<li v-for="value in tags" v-bind:class="'Tag1'">
+								<span style="color: rgb(61, 118, 153);">
+									<span>
+										<a href="" style="color: inherit;text-decoration: none;">
+											#{{value}}
+										</a>
+									</span>
+								</span>
+							</li>
+						</ul>
+
+					
+					</div>
+				</div>
+				
+			  <div v-bind:class="'buttonBox'">
+				  这里是按钮盒子
+			  </div>
 			</div>
-			
-		  <div v-bind:class="'buttonBox'">
-			  这里是按钮盒子
-		  </div>
 		</aside>
 		
 	  
@@ -99,15 +114,15 @@
 		max-width: 100%;
 		max-height: 100%;
 		
-		background-color: #ffe2e2;
-		
+		background-color:  rgba(216, 227, 231, 0.4);
+		/* #D8E3E7 */
 		border-radius: 30px;
 		
-		position: absolute;
+		/* position: absolute;
 		top: 0;
 		left: 0;
 		bottom: 0;
-		right: 0;
+		right: 0; */
 		
 		
 	}
@@ -133,7 +148,7 @@
 		min-width: 200px;
 		/* min-height: 480px; */
 		margin-right: 6px;
-		max-width: calc(100% - 12px);
+		max-width: calc(100% - 12px - 288px);
 		max-height: calc(100%);
 		
 		padding-bottom: 0px;
@@ -150,6 +165,7 @@
 		
 		position: relative;
 		
+		
 		margin-bottom: 2px;
 		
 		border-radius: 20px;
@@ -160,11 +176,11 @@
 		width: 288px;
 		height: calc(62.5% - 6px);
 		flex: 0 0 auto;	
-		background-color: #F6F6F6;
 		
 		margin-bottom: 6px;
-
-		
+		/* background-color: rgba(81, 196, 211, 0.6) ; */
+		background-color: rgba(255, 255, 255, 0.5);
+		/* #51C4D3 */
 		
 		border-radius: 20px;
 	}
@@ -172,15 +188,57 @@
 	.buttonBox{
 		
 		width: 288px;
-		height: 37.5%;
+		
 		flex: 0 0 auto;	
-		background-color: #F6F6F6;
 		margin-top: 2%;
 		margin-bottom: 0px;
 		
+		/* background-color: rgba(81, 196, 211, 0.6) ; */
+		/* #126E82 */
 		
-		position: absolute; bottom: 0px;
+		background-color: rgba(255, 255, 255, 0.5);
+		
+		position: relative;
 		
 		border-radius: 20px;
+	}
+	
+	.floatBox{
+		position: fixed;
+		right: 28px;
+		top: 20px;
+	}
+	
+	.TextBox{
+
+		padding-top: 5px;
+		padding-bottom: 5px;
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+	
+	.PicUploader{
+		
+		
+		color: rgb(31, 31, 31);
+		font-size: 20px;
+		line-height: 24px;
+		font-weight: bold;
+	}
+	
+	.PicMessage{
+		
+		color: rgb(92, 92, 92);
+		line-height: 1.33;
+	}
+	
+	.TagsBox{
+		word-break: break-all;
+		padding-inline-start: 0px;	
+	}
+	
+	.Tag1{
+		display: inline;
+		margin: 0px 12px 0px 0px;
 	}
 </style>

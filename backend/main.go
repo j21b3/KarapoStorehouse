@@ -200,5 +200,16 @@ func GetTimeline(c *gin.Context) {
 
 func SetMiddleware(Eng *gin.Engine) {
 	// 解决跨域访问，default允许所有的origins，后续视情况修改
-	Eng.Use(cors.Default())
+	// Eng.Use(cors.Default())
+
+	webOrigin := []string{"http://127.0.0.1:8848"}
+
+	conf := cors.Config{
+		AllowOrigins: webOrigin,
+		AllowMethods: []string{"GET", "POST", "UPDATE", "DELETE"},
+		AllowHeaders: []string{"Content-Type", "Access-Token"},
+		MaxAge:       6 * time.Hour,
+	}
+
+	Eng.Use(cors.New(conf))
 }

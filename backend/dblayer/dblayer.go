@@ -86,7 +86,24 @@ func (c *RawPicDBController) FindPicById(ctx context.Context, HexIDStr string) (
 	}
 
 	var ret RawPic
-	if err := c.FindOne(ctx, bson.M{"_id": objectID}).Decode(&ret); err != nil {
+	opts := options.FindOne()
+	opts.SetProjection(bson.D{{"picdata", bson.D{{"data", 1}}}})
+	if err := c.FindOne(ctx, bson.M{"_id": objectID}, opts).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return &ret, nil
+}
+
+func (c *RawPicDBController) FindDetailById(ctx context.Context, HexIDStr string) (*RawPic, error) {
+	objectID, err := primitive.ObjectIDFromHex(HexIDStr)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret RawPic
+	opts := options.FindOne()
+	opts.SetProjection(bson.D{{"picdata", bson.D{{"data", 0}}}})
+	if err := c.FindOne(ctx, bson.M{"_id": objectID}, opts).Decode(&ret); err != nil {
 		return nil, err
 	}
 	return &ret, nil
@@ -97,7 +114,7 @@ func (c *RawPicDBController) GenerateID() primitive.ObjectID {
 }
 
 // 按照时间从近到远按页进行查找 返回图片的ID切片, PageNum从1开始计数 Limit固定为20
-// 只要ctx不变化，就可以视作同一事务
+// 只要连接不变化，就可以视作同一事务
 func (c *RawPicDBController) GetTimelineID(ctx context.Context, PageNum int64) ([]string, error) {
 	findoption := options.FindOptions{}
 	Limit := int64(20)

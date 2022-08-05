@@ -33,6 +33,7 @@ func SetRoutes(Eng *gin.Engine) {
 	{
 		rawpic.GET("/:pid", GetRawPic)
 		rawpic.GET("/thumbnail", GetThumbnailPic)
+		rawpic.GET("/detail", GetPicDetail)
 	}
 	Eng.POST("/upload", UploadRawPic)
 	Eng.GET("/timeline/:page", GetTimeline)
@@ -56,12 +57,62 @@ func GetRawPic(c *gin.Context) {
 	}
 
 	//TODO:后续需要调整为协议内容
-	//c.Writer.WriteString(string(data.Data))
+	c.Writer.WriteString(string(data.Data))
+	// c.JSON(
+	// 	http.StatusOK,
+	// 	model.ReturnData{
+	// 		Status: true,
+	// 		Data:   data.PicData,
+	// 	})
+}
+
+// 获取图片详细信息接口 GET http://127.0.0.1:25790/raw/detail?pid=123
+func GetPicDetail(c *gin.Context) {
+	form := struct {
+		Pid string `form:"pid" binding:"required"`
+	}{}
+	if err := c.Bind(&form); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, model.ReturnData{
+			Status: false,
+			Err:    "ERROR input param for raw detail",
+			Data:   nil,
+		})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	data, err := RPC.FindDetailById(ctx, form.Pid)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, model.ReturnData{
+			Status: false,
+			Err:    "ERROR find Database",
+			Data:   nil,
+		})
+		return
+	}
+	ret_data := struct {
+		Title      string    `json:"title" bson:"title"`
+		FileName   string    `json:"file_name" binding:"required" bson:"file_name"`
+		Uploader   string    `json:"uploader" binding:"required" bson:"uploader"`
+		Message    string    `json:"message" bson:"message"`
+		Tags       []string  `json:"tags" bson:"tags"`
+		CreateTime time.Time `json:"update_time" bson:"create_time"`
+	}{
+		Title:      data.Title,
+		FileName:   data.FileName,
+		Uploader:   data.Uploader,
+		Message:    data.Message,
+		Tags:       data.Tags,
+		CreateTime: data.CreateTime,
+	}
+
 	c.JSON(
 		http.StatusOK,
 		model.ReturnData{
 			Status: true,
-			Data:   data.PicData,
+			Data:   ret_data,
 		})
 }
 
@@ -105,7 +156,7 @@ func UploadRawPic(c *gin.Context) {
 	})
 }
 
-// GET http://127.0.0.1:25790/thumbnail?pid=111&width=222 获取原图片
+// GET http://127.0.0.1:25790/raw/thumbnail?pid=111&width=222 获取原图片
 func GetThumbnailPic(c *gin.Context) {
 	//固定生成的略缩图都为正方形
 	form := struct {
@@ -202,7 +253,7 @@ func SetMiddleware(Eng *gin.Engine) {
 	// 解决跨域访问，default允许所有的origins，后续视情况修改
 	// Eng.Use(cors.Default())
 
-	webOrigin := []string{"http://127.0.0.1:8848"}
+	webOrigin := []string{"http://127.0.0.1:3000", "http://127.0.0.1:8848", "http://localhost:3000/"}
 
 	conf := cors.Config{
 		AllowOrigins: webOrigin,

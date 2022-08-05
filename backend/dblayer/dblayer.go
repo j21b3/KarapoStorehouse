@@ -113,11 +113,11 @@ func (c *RawPicDBController) GenerateID() primitive.ObjectID {
 	return primitive.NewObjectID()
 }
 
-// 按照时间从近到远按页进行查找 返回图片的ID切片, PageNum从1开始计数 Limit固定为20
+// 按照时间从近到远按页进行查找 返回图片的ID切片, PageNum从1开始计数 Limit固定为24
 // 只要连接不变化，就可以视作同一事务
 func (c *RawPicDBController) GetTimelineID(ctx context.Context, PageNum int64) ([]string, error) {
 	findoption := options.FindOptions{}
-	Limit := int64(20)
+	Limit := int64(24)
 	if PageNum > 0 {
 		findoption.SetLimit(Limit)
 		findoption.SetSkip(Limit * (PageNum - 1))

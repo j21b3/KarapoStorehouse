@@ -253,7 +253,7 @@ func SetMiddleware(Eng *gin.Engine) {
 	// 解决跨域访问，default允许所有的origins，后续视情况修改
 	// Eng.Use(cors.Default())
 
-	webOrigin := []string{"http://127.0.0.1:3000", "http://127.0.0.1:8848", "http://localhost:3000/"}
+	webOrigin := []string{"http://127.0.0.1:3000", "http://127.0.0.1:8848", "http://localhost:3000"}
 
 	conf := cors.Config{
 		AllowOrigins: webOrigin,

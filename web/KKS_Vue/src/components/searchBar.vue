@@ -3,8 +3,7 @@
 	    <el-input placeholder="" round v-model="searchOption.input" class="searchClass">
 			<template #prepend>
 				<el-select v-model="searchOption.select" placeholder="搜索模式" style="width: 80px;">
-					<el-option label="ID" value="1"/>
-					<el-option label="标签(未实现)" value="2"/>
+					<el-option v-for="(text,index) in searchMode" :label="text" :value="index" />
 				</el-select>
 			</template>
 			<template #append>
@@ -31,6 +30,10 @@
 					select:"",
 				},
 				Search,
+				searchMode:[
+					"ID",
+					"标签(未实现)",
+				],
 			}
 		},
 		
@@ -42,7 +45,6 @@
 					ElMessage({
 					        type: 'warning',
 					        message: `未完待续`,
-							
 					      })
 				}
 			}

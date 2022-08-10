@@ -10,6 +10,10 @@ const routes=[
 	    component: () => import('./components/PicShowPage.vue')
 	},
 	{
+		path:'/pic',
+		component: () => import('./components/PicShowPage.vue')
+	},
+	{
 		path:'/upload',
 		component: () => import('./components/uploadPage.vue')
 	},

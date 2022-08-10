@@ -3,7 +3,7 @@
 	    <el-input placeholder="" round v-model="searchOption.input" class="searchClass">
 			<template #prepend>
 				<el-select v-model="searchOption.select" placeholder="搜索模式" style="width: 80px;">
-					<el-option v-for="(text,index) in searchMode" :label="text" :value="index" />
+					<el-option v-for="(text,index) in searchMode" :label="text" :value="text" />
 				</el-select>
 			</template>
 			<template #append>
@@ -27,7 +27,7 @@
 			return{
 				searchOption:{
 					input:"",
-					select:"",
+					select:"ID",
 				},
 				Search,
 				searchMode:[
@@ -39,7 +39,8 @@
 		
 		methods:{
 			searchButtonClick(){
-				if(this.searchOption.select=="1"){
+				
+				if(this.searchOption.select=="ID"){
 					window.open(api.domain.pic+this.searchOption.input,'_blank')
 				}else{
 					ElMessage({

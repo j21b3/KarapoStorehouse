@@ -1,6 +1,4 @@
-<template>
-	<headBar />
-	
+<template>	
 	<el-upload
 	    v-model:file-list="fileList"
 	    class="upload-demo"

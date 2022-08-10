@@ -1,5 +1,4 @@
 <template>
-	<headBar />
 	<!-- 布局需要优化 -->
 	<div :class="'ShowBox'">
 	  

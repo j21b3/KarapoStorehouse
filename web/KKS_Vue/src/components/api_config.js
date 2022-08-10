@@ -1,4 +1,5 @@
 var url = "http://localhost:25790"
+var domain = "http://localhost:3000"
 
 var api = {
 	"raw":{
@@ -12,7 +13,10 @@ var api = {
 	//POST   /upload
 	"upload":url+"/upload",
 	//GET    /timeline/:page
-	"timeline":url+"/timeline/"
+	"timeline":url+"/timeline/",
+	"domain":{
+		"pic":domain+"/pic/",
+	}
 }
 
 export default api

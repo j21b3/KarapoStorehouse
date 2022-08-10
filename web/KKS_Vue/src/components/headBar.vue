@@ -2,9 +2,15 @@
 	<el-header>
 		<el-row :glutter="20" :class="'myheader'">
 			<el-col :span="1">
-				<a href="/">
-					<img :src="klpHead" alt="头像" :class="klphead" />
-				</a>
+				<router-link to="/">
+					<!-- <img :src="klpHead" alt="头像" :class="klphead" /> -->
+					<el-avatar :src="klpHead" :class="hlphead"></el-avatar>
+				</router-link>
+			</el-col>
+			<el-col :span="1">
+				<router-link to="/upload/">
+					上传
+				</router-link>
 			</el-col>
 			<el-col :span="7">
 				<searchBar></searchBar>
@@ -47,7 +53,7 @@
 		position: fixed;
 		top: 0%;left: 0%;right: 0%;
 		width: 100%;
-		z-index: 999999;
+		z-index: 2000;
 		margin-bottom: 3px;
 		
 		border-bottom-left-radius: 10px;

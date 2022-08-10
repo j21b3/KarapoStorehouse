@@ -2,7 +2,7 @@
 	<div>
 	    <el-input placeholder="" round v-model="searchOption.input" class="searchClass">
 			<template #prepend>
-				<el-select v-model="searchOption.select" placeholder="搜索模式" style="width: 120px;">
+				<el-select v-model="searchOption.select" placeholder="搜索模式" style="width: 80px;">
 					<el-option label="ID" value="1"/>
 					<el-option label="标签(未实现)" value="2"/>
 				</el-select>
@@ -17,6 +17,8 @@
 <script>
 	import {Search} from '@element-plus/icons-vue'
 	import { ref } from 'vue'
+	import api from './api_config.js'
+	import { ElMessage } from 'element-plus'
 	
 	export default{
 		
@@ -35,9 +37,13 @@
 		methods:{
 			searchButtonClick(){
 				if(this.searchOption.select=="1"){
-					console.log(this.searchOption.input)
+					window.open(api.domain.pic+this.searchOption.input,'_blank')
 				}else{
-					console.log(this.searchOption.select)
+					ElMessage({
+					        type: 'warning',
+					        message: `未完待续`,
+							
+					      })
 				}
 			}
 		}

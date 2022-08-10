@@ -1,7 +1,7 @@
 <template>
 	<headBar />
 	<!-- 布局需要优化 -->
-	<div id="PicShow" :class="'ShowBox'">
+	<div :class="'ShowBox'">
 	  
 		<div v-if="success" :class="'imageShowBox'">
 			<img :src="imglink" alt="this is a test" :class="'image'">
@@ -24,7 +24,8 @@
 							<li v-for="value in tags" :class="'Tag1'">
 								<span style="color: rgb(61, 118, 153);">
 									<span>
-										<a href="" style="color: inherit;text-decoration: none;">
+										<!-- TODO：以后做好标签查询之后把href="url"填进去 -->
+										<a  style="color: inherit;text-decoration: none;" v-on:click="notDone">
 											#{{value}}
 										</a>
 									</span>
@@ -57,13 +58,16 @@
 <script >
 	import axios from 'axios'
 	import api from './api_config.js'
-	// import HeadBar from './headBar.vue'
 	import {Download} from '@element-plus/icons-vue'
 	import download from 'downloadjs'
+	
 	import headBar from './headBar.vue'
 	
+	import { ElMessage } from 'element-plus'
+	
 	export default{
-		el: '#PicShow',
+		name:'PicShowPage',
+		
 		data(){
 			return {
 				title:"人是会思考的芦苇",
@@ -72,8 +76,8 @@
 				tags:[],
 				uploader:"404",
 				success:false,
-				// pid:this.$route.params.id,
-				pid:"62dbd0d283d5641480925801",
+				pid:this.$route.params.id,
+				// pid:"62dbd0d283d5641480925801",
 				imglink:"",
 				failimg:"/failpic.jpeg",
 				Download,
@@ -130,7 +134,27 @@
 		
 		methods:{
 			DownloadButtonClick(){
-				download(this.imglink)
+				if (this.success){
+					ElMessage({
+					        type: 'success',
+					        message: `已开始下载`,
+							
+					      })
+					download(this.imglink)	
+				}else{
+					ElMessage({
+					        type: 'warning',
+					        message: `没有能下载的东西`,
+					      })
+				}
+			},
+			
+			notDone(){
+				ElMessage({
+				        type: 'warning',
+				        message: `未完待续`,
+						
+				      })
 			}
 		}
 	}

@@ -14,8 +14,8 @@ const routes=[
 		component: () => import('./components/PicShowPage.vue')
 	},
 	{
-		path:'/upload',
-		component: () => import('./components/uploadPage.vue')
+		path:'/uploadpic',
+		component: () => import('./components/uploadPicPage.vue')
 	},
 ]
 

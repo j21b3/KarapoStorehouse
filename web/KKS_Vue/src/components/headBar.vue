@@ -8,7 +8,7 @@
 				</router-link>
 			</el-col>
 			<el-col :span="1">
-				<router-link to="/upload/">
+				<router-link to="/uploadpic">
 					上传
 				</router-link>
 			</el-col>

@@ -30,7 +30,7 @@
 				    v-model:file-list="tmpfileList"
 				    action="none"
 				    list-type="picture-card"
-				    :on-preview="handlePictureCardPreview"
+				    :on-	="handlePictureCardPreview"
 				    :on-remove="handleRemove"
 					:auto-upload="false"
 					:on-change="onChangeTest"
@@ -51,7 +51,7 @@
 					  <el-input v-model="form.Message" />
 				</el-form-item>
 				<el-form-item label="标签">
-					  <el-input v-model="form.Tags" />
+					  <el-input v-model="form.Tags" placeholder="以空格隔开"/>
 				</el-form-item>
 			
 			
@@ -60,21 +60,33 @@
 			
 		</el-form>
 	</el-dialog> 
-		
+	
+	<el-dialog v-model="dialogVisible">
+    	<img w-full :src="dialogImageUrl" alt="Preview Image" />
+ 	</el-dialog>
 </template>
 
 <script lang="ts" setup>
+	export interface UploadForm{
+		Uploader: '',
+		Title: '',
+		Message: '',
+		Tags: [],
+		FileName: '',
+	}
+	
 	import { reactive, ref } from 'vue'
 	import {Close, Check,Plus} from '@element-plus/icons-vue'
 	import { UploadProps, UploadUserFile } from 'element-plus'
 	import { ElMessage } from 'element-plus'
+	import { preview } from 'vite';
 
 	const dialogFormVisible = ref(false)
 	const dialogImageUrl = ref('')
 	const dialogVisible = ref(false)
 	
 	const tmpfileList = ref<UploadUserFile[]>([])
-	const fileList = ref<UploadUserFile[]>([])
+	const fileList = ref<object[]>([])
 	
 	const upload = ref(null)
 	
@@ -83,8 +95,6 @@
 	  Title: '',
 	  Message: '',
 	  Tags: [],
-	  Data: '',
-	  FileName: '',
 	})
 	
 	const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
@@ -92,6 +102,7 @@
 	}
 	
 	const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
+		console.log("preview")
 	  dialogImageUrl.value = uploadFile.url!
 	  dialogVisible.value = true
 	}
@@ -100,40 +111,37 @@
 		console.log("onchange")
 		console.log(uploadFile, uploadFiles)
 	}
-	
-	let merger = (...opts) => {
-		let res = {};
-		
-		let combine = (opt) => {
-			for(let prop in opt) {
-				if(opt.hasOwnProperty(prop)) {
 
-					//下面是深拷贝与浅拷贝的区别，用到了递归的思想
-					if(Object.prototype.toString.call(opt[prop]) === '[object Object]') {
-
-						res[prop] = merger(res[prop], opt[prop]);
-
-					}else {
-
-						res[prop] = opt[prop];
-
+	const createUpPic = (url, fileName,formData) => {
+		var pic = {
+			url: url,
+			form: {
+				Uploader: formData.Uploader,
+				Title: formData.Title,
+				Message: formData.Message,
+				Data: formData.Data,
+				FileName: fileName,
+				Tags:Array<string>(),
+			}
+		}
+		if (formData.Tags != "") {
+			var tmp = formData.Tags.split(' ')
+			if (tmp.length != 0) {
+				var i = 0
+				for (i = 0; i < tmp.length; i++) {
+					if (tmp[i] != "") {
+						pic.form.Tags.push(tmp[i])
 					}
-					
 				}
 			}
 		}
-		
-		for (let i = 0; i < opts.length; i++) {
-			combine(opts[i]);
-		}
-		return res;
+		return pic
 	}
 
-	
 	const okButtonClick = () => {
-		console.log(typeof tmpfileList)
+		console.log(tmpfileList.value.length)
 		console.log(tmpfileList)
-		if (tmpfileList._rawValue.length == 0){
+		if (tmpfileList.value.length == 0){
 			dialogFormVisible.value = false
 			ElMessage({
 			        type: 'warning',
@@ -142,9 +150,16 @@
 			return
 		}
 		// TODO：這裏要加入表單校驗
-		//  TODO:　還有的問題１、把數據轉移到自定義的結構體中　２、深淺拷貝　　３、結構體數組的刪除等
-		let tmp = merger(tmpfileList.value,fileList.value)
-		fileList.value=tmp
+		
+		var i = 0
+		for (i = 0; i < tmpfileList.value.length; i++){
+			var tmp = createUpPic(tmpfileList.value[i].url, tmpfileList.value[i].name, form)
+			fileList.value.push(tmp)
+		}
+		form.Uploader = ""
+		form.Title = ""
+		form.Message = ""
+		form.Tags = []
 		dialogFormVisible.value = false
 		upload.value.clearFiles()
 	}

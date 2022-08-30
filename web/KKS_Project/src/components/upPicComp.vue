@@ -4,10 +4,8 @@
 			<el-col
 			v-for="(file, index) in fileList "
 			:key="file"
-			:span="4"
-			:offset="index > 0 ? 2 : 0"
+			:span="4"			
 			>
-
 			<el-card :body-style="{ padding: '0px' }">
 				<div :class="'image_show'">
 					<el-image :src="file.url" 

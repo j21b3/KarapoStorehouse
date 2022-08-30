@@ -11,8 +11,7 @@
 				shadow="hover">
 				<div :class="'image_show'">
 					<el-image :src="file.url" 
-					:fit="scale-down" 
-					:loading="lazy"
+					fit="scale-down" 
 					:preview-src-list="fileUrlList"
 					:initial-index="index"
 					/>
@@ -220,7 +219,9 @@
 	}
 
 	const DeleteFile = (index) => {
-		console.log("click delete button"+ index)
+		console.log("click delete button" + index)
+		fileList.value.splice(index, 1)
+		fileUrlList.value.splice(index,1)
 	}
 
 </script>

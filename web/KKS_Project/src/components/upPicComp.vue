@@ -37,21 +37,25 @@
 		:close-on-click-modal="false"
 		v-model="dialogFormVisible" 
 		title="图片信息设置" 
-		width="40%">
+		width="44%">
+		<el-upload
+			v-model:file-list="tmpfileList"
+			action="none"
+			list-type="picture-card"
+			:on-preview="handlePictureCardPreview"
+			:on-remove="handleRemove"
+			:auto-upload="false"
+			:on-change="onChangeTest"
+			:multiple="true"
+			ref="upload"
+			accept=".jpg,.jpeg,.png,.gif"
+			
+			>
+			<el-icon><Plus /></el-icon>
+		</el-upload>
+
 		<el-form :model="form" label-width="140px">
-				<el-upload
-				    v-model:file-list="tmpfileList"
-				    action="none"
-				    list-type="picture-card"
-				    :on-preview="handlePictureCardPreview"
-				    :on-remove="handleRemove"
-					:auto-upload="false"
-					:on-change="onChangeTest"
-					:multiple="true"
-					ref="upload"
-				  >
-				    <el-icon><Plus /></el-icon>
-				</el-upload>
+				
 				<div class="el-upload__tip">
 				        下方属性会赋值给所有图片，如需添加不同属性需要多次填写表单
 				</div>
@@ -223,5 +227,10 @@
 
 	.dialogView{
 		width: 60%
+	}
+
+	.el-upload{
+		display: table;
+		margin: 0 auto;
 	}
 </style>

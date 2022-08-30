@@ -2,27 +2,36 @@
 	<div :class="'display-area'">
 		<el-row :gutter="20">
 			<el-col
-			v-for="(o, index) in fileList "
-			:key="o"
+			v-for="(file, index) in fileList "
+			:key="file"
 			:span="4"
 			:offset="index > 0 ? 2 : 0"
 			>
 
 			<el-card :body-style="{ padding: '0px' }">
 				<div :class="'image_show'">
-					<el-image :src="o.url" 
+					<el-image :src="file.url" 
 					:fit="scale-down" 
 					:loading="lazy"
 					:preview-src-list="fileUrlList"
 					:initial-index="index"
 					/>
 				</div>
-				<div style="padding: 14px">
-				<span>Yummy hamburger</span>
-				<div class="bottom">
-					<time class="time">{{ currentDate }}</time>
-					<el-button text class="button">Operating</el-button>
-				</div>
+				<div :class="'detailShow'">
+					<!-- <span>Yummy hamburger</span>
+					<div class="bottom">
+						<time class="time">{{ currentDate }}</time>
+						<el-button text class="button">Operating</el-button>
+					</div> -->
+					<p style="margin-top: 0px; margin-bottom: 0px">
+						上传：{{file.form.Uploader}} <br/>
+						标题：{{file.form.Title}}	<br/>
+						Msg: {{file.form.Title}}	<br/>
+					</p>
+					
+					<TagComp :Tags="file.form.Tags" v-if="file.form.Tags.length > 0"/>
+					<td v-if="file.form.Tags.length <= 0">tags:</td>
+
 				</div>
 			</el-card>
 			</el-col>
@@ -102,7 +111,7 @@
 	import {Close, Check,Plus} from '@element-plus/icons-vue'
 	import { UploadProps, UploadUserFile } from 'element-plus'
 	import { ElMessage } from 'element-plus'
-	import { preview } from 'vite';
+	import TagComp from './TagComp.vue'
 
 	const dialogFormVisible = ref(false)
 	const dialogImageUrl = ref('')
@@ -226,11 +235,12 @@
 	}
 
 	.dialogView{
-		width: 60%
+		width: 60%;
 	}
 
-	.el-upload{
-		display: table;
-		margin: 0 auto;
+	.detailShow{
+		padding: 14px;
+		text-align: left;
 	}
+
 </style>

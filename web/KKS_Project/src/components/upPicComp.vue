@@ -6,7 +6,9 @@
 			:key="file"
 			:span="4"			
 			>
-			<el-card :body-style="{ padding: '0px' }">
+			<el-card 
+				:body-style="{ padding: '0px' }"
+				shadow="hover">
 				<div :class="'image_show'">
 					<el-image :src="file.url" 
 					:fit="scale-down" 
@@ -30,7 +32,19 @@
 					<TagComp :Tags="file.form.Tags" v-if="file.form.Tags.length > 0"/>
 					<td v-if="file.form.Tags.length <= 0">tags:</td>
 
+					<!-- detail上面的操作按钮 -->
+					<span :class="'detail_button_action'">
+						<el-button type="info" :icon="EditPen" circle 
+							@click="EditDetail(index)"
+							:class="'hide_button'"/>
+						<el-button type="info" :icon="Delete" circle 
+							@click="DeleteFile(index)"
+							:class="'hide_button'"/>
+					</span>
+
 				</div>
+
+				
 			</el-card>
 			</el-col>
 		</el-row>
@@ -106,7 +120,7 @@
 	}
 	
 	import { reactive, ref } from 'vue'
-	import {Close, Check,Plus} from '@element-plus/icons-vue'
+	import {Close, Check,Plus,EditPen,Delete} from '@element-plus/icons-vue'
 	import { UploadProps, UploadUserFile } from 'element-plus'
 	import { ElMessage } from 'element-plus'
 	import TagComp from './TagComp.vue'
@@ -200,7 +214,14 @@
 		dialogFormVisible.value = false
 		upload.value.clearFiles()
 	}
-	
+
+	const EditDetail = (index) => {
+		console.log("click edit button " + index)
+	}
+
+	const DeleteFile = (index) => {
+		console.log("click delete button"+ index)
+	}
 
 </script>
 	
@@ -218,10 +239,6 @@
 
 	}
 	.image_show{
-		/* max-width: 186px;
-		max-height: 186px;
-		min-width: 186px;
-		min-height: 186px; */
 		position: relative;
 	}
 
@@ -239,6 +256,27 @@
 	.detailShow{
 		padding: 14px;
 		text-align: left;
+		position: relative;
 	}
 
+	.detail_button_action:hover{
+		opacity: 1;
+	}
+
+	.detail_button_action{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+		cursor: default;
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		color: #fff;
+		opacity: 0;
+		font-size: 20px;
+		background-color: var(--el-overlay-color-lighter);
+    	transition: opacity var(--el-transition-duration);
+	}
 </style>

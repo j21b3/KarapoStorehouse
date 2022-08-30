@@ -1,39 +1,53 @@
 <template>
-	<el-row>
-	    <el-col
-	      v-for="(o, index) in fileList "
-	      :key="o"
-	      :span="8"
-	      :offset="index > 0 ? 2 : 0"
-	    >
-	      <el-card :body-style="{ padding: '0px' }">
-	        <img
-	          :src="o.url" :class="'image_show'"
-	        />
-	        <div style="padding: 14px">
-	          <span>Yummy hamburger</span>
-	          <div class="bottom">
-	            <time class="time">{{ currentDate }}</time>
-	            <el-button text class="button">Operating</el-button>
-	          </div>
-	        </div>
-	      </el-card>
-	    </el-col>
-	  </el-row>
+	<div :class="'display-area'">
+		<el-row :gutter="20">
+			<el-col
+			v-for="(o, index) in fileList "
+			:key="o"
+			:span="4"
+			:offset="index > 0 ? 2 : 0"
+			>
+
+			<el-card :body-style="{ padding: '0px' }">
+				<div :class="'image_show'">
+					<el-image :src="o.url" 
+					:fit="scale-down" 
+					:loading="lazy"
+					:preview-src-list="fileUrlList"
+					:initial-index="index"
+					/>
+				</div>
+				<div style="padding: 14px">
+				<span>Yummy hamburger</span>
+				<div class="bottom">
+					<time class="time">{{ currentDate }}</time>
+					<el-button text class="button">Operating</el-button>
+				</div>
+				</div>
+			</el-card>
+			</el-col>
+		</el-row>
+	</div>
 	
 	<el-button text @click="dialogFormVisible = true">
 		信息修改占位
 	</el-button>
-	<el-dialog v-model="dialogFormVisible" title="图片信息设置" width="40%">
+	<el-dialog 
+		:before-close="closeButtonClick" 
+		:close-on-click-modal="false"
+		v-model="dialogFormVisible" 
+		title="图片信息设置" 
+		width="40%">
 		<el-form :model="form" label-width="140px">
 				<el-upload
 				    v-model:file-list="tmpfileList"
 				    action="none"
 				    list-type="picture-card"
-				    :on-	="handlePictureCardPreview"
+				    :on-preview="handlePictureCardPreview"
 				    :on-remove="handleRemove"
 					:auto-upload="false"
 					:on-change="onChangeTest"
+					:multiple="true"
 					ref="upload"
 				  >
 				    <el-icon><Plus /></el-icon>
@@ -60,10 +74,15 @@
 			
 		</el-form>
 	</el-dialog> 
-	
-	<el-dialog v-model="dialogVisible">
-    	<img w-full :src="dialogImageUrl" alt="Preview Image" />
- 	</el-dialog>
+
+
+	<el-dialog v-model="dialogVisible" :class="'dialogView'">
+		<el-image :src="dialogImageUrl" 
+				:fit="'contain'"
+				alt="Preview Image" 
+				/>
+	</el-dialog>
+
 </template>
 
 <script lang="ts" setup>
@@ -87,6 +106,7 @@
 	
 	const tmpfileList = ref<UploadUserFile[]>([])
 	const fileList = ref<object[]>([])
+	const fileUrlList = ref<string[]>([])
 	
 	const upload = ref(null)
 	
@@ -103,8 +123,8 @@
 	
 	const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
 		console.log("preview")
-	  dialogImageUrl.value = uploadFile.url!
-	  dialogVisible.value = true
+	  	dialogImageUrl.value = uploadFile.url!
+	  	dialogVisible.value = true
 	}
 	
 	const onChangeTest: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
@@ -135,6 +155,7 @@
 				}
 			}
 		}
+		fileUrlList.value.push(pic.url)
 		return pic
 	}
 
@@ -169,12 +190,7 @@
 		upload.value.clearFiles()
 	}
 	
-	
-	
-	 
-	
-	
-	
+
 </script>
 	
 <style scoped>
@@ -185,12 +201,27 @@
 	.el-input {
 	  width: 300px;
 	}
+	.display-area{
+		padding-left: 72px;
+		padding-right: 72px;
+
+	}
 	.image_show{
-		object-fit: contain;
-		width:100%;
-		height:100%;
-		display:block;
+		/* max-width: 186px;
+		max-height: 186px;
+		min-width: 186px;
+		min-height: 186px; */
+		position: relative;
 	}
 
+	.el-row {
+		margin-bottom: 20px;
+	}
+	.el-row:last-child {
+		margin-bottom: 0;	
+	}
 
+	.dialogView{
+		width: 60%
+	}
 </style>

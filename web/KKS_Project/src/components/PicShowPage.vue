@@ -19,18 +19,7 @@
 						<h4>{{ title }}</h4>
 						
 						<p :class="'PicMessage'">{{ message }}</p>
-						<ul :class="'TagsBox'">
-							<li v-for="value in tags" :class="'Tag1'">
-								<span style="color: rgb(61, 118, 153);">
-									<span>
-										<!-- TODO：以后做好标签查询之后把href="url"填进去 -->
-										<a  style="color: inherit;text-decoration: none;" v-on:click="notDone">
-											#{{value}}
-										</a>
-									</span>
-								</span>
-							</li>
-						</ul>
+						<TagComp :Tags="tags" />
 
 					
 					</div>
@@ -63,6 +52,7 @@
 	import headBar from './headBar.vue'
 	
 	import { ElMessage } from 'element-plus'
+	import TagComp from './TagComp.vue'
 	
 	export default{
 		name:'PicShowPage',
@@ -85,6 +75,7 @@
 		
 		components:{
 			headBar,
+			TagComp,
 		},
 	
 		mounted () {
@@ -292,16 +283,6 @@
 		
 		color: rgb(92, 92, 92);
 		line-height: 1.33;
-	}
-	
-	.TagsBox{
-		word-break: break-all;
-		padding-inline-start: 0px;	
-	}
-	
-	.Tag1{
-		display: inline;
-		margin: 0px 12px 0px 0px;
 	}
 	
 </style>

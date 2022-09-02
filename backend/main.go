@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -16,7 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 现版本先只用一个会话连接数据库，后续更新用户管理后每个用户都分配一个
+// TODO:现版本先只用一个会话连接数据库，后续更新用户管理后每个用户都分配一个
 var RPC *dblayer.RawPicDBController
 
 func main() {
@@ -118,6 +119,8 @@ func GetPicDetail(c *gin.Context) {
 
 // POST http://ip:25790/upload 上传原图片
 func UploadRawPic(c *gin.Context) {
+	fmt.Println(c.DefaultPostForm("file_name", "default_file"))
+
 	data := model.PicData{}
 	if err := c.ShouldBindJSON(&data); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, model.ReturnData{
@@ -253,7 +256,8 @@ func SetMiddleware(Eng *gin.Engine) {
 	// 解决跨域访问，default允许所有的origins，后续视情况修改
 	// Eng.Use(cors.Default())
 
-	webOrigin := []string{"http://127.0.0.1:3000", "http://127.0.0.1:8848", "http://localhost:3000"}
+	webOrigin := []string{"http://127.0.0.1:3000", "http://127.0.0.1:8848", "http://localhost:3000",
+		"http://127.0.0.1:5173", "http://localhost:5173"}
 
 	conf := cors.Config{
 		AllowOrigins: webOrigin,

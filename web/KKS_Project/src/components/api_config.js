@@ -1,5 +1,5 @@
 var url = "http://localhost:25790"
-var domain = "http://localhost:3000"
+var domain = "http://localhost:5173"
 
 var api = {
 	"raw":{
@@ -13,7 +13,9 @@ var api = {
 	//POST   /upload
 	"upload":url+"/upload",
 	//GET    /timeline/:page
-	"timeline":url+"/timeline/",
+	"timeline": url + "/timeline/",
+	
+	//站内转向使用
 	"domain":{
 		"pic":domain+"/pic/",
 	}

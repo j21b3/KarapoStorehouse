@@ -7,41 +7,54 @@
 			:span="4"			
 			>
 			<el-card 
-				:body-style="{ padding: '0px' }"
+				:body-style="{ padding: '0px'}"
 				shadow="hover">
-				<div :class="'image_show'">
-					<el-image :src="file.url" 
-					fit="scale-down" 
-					:preview-src-list="fileUrlList"
-					:initial-index="index"
-					/>
-				</div>
-				<div :class="'detailShow'">
-					<p style="margin-top: 0px; margin-bottom: 0px">
-						上传：{{file.form.Uploader}} <br/>
-						标题：{{file.form.Title}}	<br/>
-						Msg: {{file.form.Message}}	<br/>
-					</p>
-					
-					<TagComp :Tags="file.form.Tags" v-if="file.form.Tags.length > 0"/>
-					<td v-if="file.form.Tags.length <= 0">tags:</td>
+				<div style="position: relative">
+					<div :class="'image_show'">
+						<el-image :src="file.url" 
+						fit="scale-down" 
+						:preview-src-list="fileUrlList"
+						:initial-index="index"
+						/>
+					</div>
+					<div :class="'detailShow'">
+						<p style="margin-top: 0px; margin-bottom: 0px">
+							上传：{{file.form.Uploader}} <br/>
+							标题：{{file.form.Title}}	<br/>
+							Msg: {{file.form.Message}}	<br/>
+						</p>
+						
+						<TagComp :Tags="file.form.Tags" v-if="file.form.Tags.length > 0"/>
+						<td v-if="file.form.Tags.length <= 0">tags:</td>
 
-					<!-- detail上面的操作按钮 -->
-					<span :class="beginUpload==false?'detail_button_action':'detail_button_disabled'">
-						<el-button type="info" :icon="EditPen" circle 
-							@click="EditDetail(index)"
-							:class="'hide_button'"
-							/>
-						<el-button type="info" :icon="Delete" circle 
-							@click="DeleteFile(index)"
-							:class="'hide_button'"
-							/>
+						<!-- detail上面的操作按钮 -->
+						<span :class="beginUpload==false?'detail_button_action':'detail_button_disabled'">
+							<el-button type="info" :icon="EditPen" circle 
+								@click="EditDetail(index)"
+								:class="'hide_button'"
+								/>
+							<el-button type="info" :icon="Delete" circle 
+								@click="DeleteFile(index)"
+								:class="'hide_button'"
+								/>
+						</span>
+
+					</div>
+					<!-- 上传时显示的进度条界面 -->
+					<span :class="beginUpload==true?'progress_on':'progress_off'">
+					<!-- <span :class="'progress_on'"> -->
+						<el-progress type="circle" 
+						:percentage="file.percentage"
+						:status="file.uploadStatus"
+						style="opacity:1"
+						>
+							<template :class="file.uploadStatus == 'success' ||
+											file.uploadStatus == 'ready' ? 'progress_off' : 'progressWarning_on'">
+								<span>{{ file.TextBox }}</span>
+							</template>
+						</el-progress>
 					</span>
-
 				</div>
-				<!-- 上传时显示的进度条界面 -->
-
-				
 			</el-card>
 			</el-col>
 		</el-row>
@@ -169,7 +182,7 @@
 	}
 	
 	import { reactive, ref } from 'vue'
-	import {Close, Check,Plus,EditPen,Delete} from '@element-plus/icons-vue'
+	import {Close, Check,Plus,EditPen,Delete, Position} from '@element-plus/icons-vue'
 	import { UploadProps, UploadUserFile } from 'element-plus'
 	import { ElMessage } from 'element-plus'
 	import TagComp from './TagComp.vue'
@@ -221,10 +234,13 @@
 				Uploader: formData.Uploader,
 				Title: formData.Title,
 				Message: formData.Message,
-				Data: file.raw,
+				Data: file,
 				FileName: file.name,
 				Tags: Array<string>(),
-			}
+			},
+			uploadStatus: "ready",
+			percentage: 0,
+			TextBox:"",
 		}
 		if (formData.Tags != "") {
 			var tmp = formData.Tags.split(' ')
@@ -362,7 +378,7 @@
 		var filebuf = []
 
 		try {
-			let arrayBuffer = await readPicAsync(form.form.Data)
+			let arrayBuffer = await readPicAsync(form.form.Data.raw)
 			var array = new Uint8Array(arrayBuffer);
 			for (const a of array) {
 				filebuf.push(a);
@@ -400,7 +416,9 @@
 				console.log("PostPicFormAsync" + response.data)
 				console.log(response.status)
 				console.log(response.data.data)
-				return response
+				if (response.status == 200) {
+					return true
+				}
 			})
 			.catch(function (err) {
 				console.log("err catch+" + err)
@@ -409,24 +427,58 @@
 		} catch (err) {
 			console.log("PostPicFormAsync err:" + err)
 		}
-		return ret
+		return false
 
 	}
 	
 
 	const uploadButtonClick = async () => {
 		beginUpload.value = true;
-		// for (var i = 0; i < fileList.value.length; i++) {
-		// 	if ( true == await PostSinglePic(fileList.value[i])) {
-		// 		console.log("success upload pic"+i)
-		// 	} else {
-		// 		console.log("fail upload pic"+i)
-		// 	}
-		// }
+		for (var i = 0; i < fileList.value.length; i++) {
+			fileList.value[i].percentage = 20
+			fileList.value[i].form.data
+			if (checkPicSizeOversize(fileList.value[i].form.Data) == true) {
+				fileList.value[i].uploadStatus = "exception"
+				fileList.value[i].TextBox = "文件大小大于16M"
+				continue
+			}
+
+			fileList.value[i].percentage = 40
+
+			if (await PostSinglePic(fileList.value[i]) == true) {
+				fileList.value[i].percentage = 80
+				fileList.value[i].uploadStatus = "success"
+				
+				console.log("success upload pic"+i)
+			} else {
+				fileList.value[i].status = "warning"
+				fileList.value[i].TextBox = "图片上传失败"
+				console.log("fail upload pic"+i)
+			}
+			fileList.value[i].percentage = 100
+
+		}
+
+		// TODO:在上传完成后删除全部成功的图片
+		var temp = ref<object[]>([])
+		for (var i = 0; i < fileList.value.length; i++) {
+			if (fileList.value[i].status != "success") {
+				temp.value.push(fileList.value[i])
+			}
+		}
+		fileList.value = temp.value
+
 		// beginUpload.value = false;
 
 	}
-
+	
+	const checkPicSizeOversize = (file) => {
+		if (file.size / 1024 / 1024 > 16) {
+			return true
+		} else {
+			return false
+		}
+	}
 </script>
 	
 <style scoped>
@@ -486,5 +538,27 @@
 		font-size: 20px;
 		background-color: var(--el-overlay-color-lighter);
     	transition: opacity var(--el-transition-duration);
+	}
+
+	.progress_on{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+		justify-content: center;
+		align-items: center;
+		vertical-align: middle;
+		display: flex;
+
+		background-color: white;	
+		opacity: 0.85;
+	}
+
+	.progress_off{
+		display: none;
+	}
+	.progressWarning_on{
+		display: inline;
 	}
 </style>

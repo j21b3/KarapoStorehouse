@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -119,7 +118,6 @@ func GetPicDetail(c *gin.Context) {
 
 // POST http://ip:25790/upload 上传原图片
 func UploadRawPic(c *gin.Context) {
-	fmt.Println(c.DefaultPostForm("file_name", "default_file"))
 
 	data := model.PicData{}
 	if err := c.ShouldBindJSON(&data); err != nil {

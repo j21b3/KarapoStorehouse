@@ -19,6 +19,8 @@ import (
 // TODO:现版本先只用一个会话连接数据库，后续更新用户管理后每个用户都分配一个
 var RPC *dblayer.RawPicDBController
 
+const timeLimit = 20 * time.Second
+
 func main() {
 	Eng := gin.Default()
 
@@ -43,7 +45,7 @@ func SetRoutes(Eng *gin.Engine) {
 func GetRawPic(c *gin.Context) {
 	pidstr := c.Param("pid")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeLimit)
 	defer cancel()
 
 	data, err := RPC.FindPicById(ctx, pidstr)
@@ -80,7 +82,7 @@ func GetPicDetail(c *gin.Context) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeLimit)
 	defer cancel()
 
 	data, err := RPC.FindDetailById(ctx, form.Pid)
@@ -129,7 +131,7 @@ func UploadRawPic(c *gin.Context) {
 		return
 	}
 	//TODO:后续需要校验data内容
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeLimit)
 	defer cancel()
 	id := RPC.GenerateID()
 	err := RPC.InsertPic(ctx, dblayer.RawPic{
@@ -173,7 +175,7 @@ func GetThumbnailPic(c *gin.Context) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeLimit)
 	defer cancel()
 
 	data, err := RPC.FindPicById(ctx, form.Pid)
@@ -232,7 +234,7 @@ func GetTimeline(c *gin.Context) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeLimit)
 	defer cancel()
 
 	ret, err := RPC.GetTimelineID(ctx, page)

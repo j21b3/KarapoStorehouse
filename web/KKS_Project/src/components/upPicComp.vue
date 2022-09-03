@@ -328,8 +328,23 @@ import { fa } from 'element-plus/es/locale'
 
 	//FIXME: 由于reader 和 axios 都是异步的，需要解决异步同步问题，否则无法正常显示发送状态； post的response还没有进行校验
 
+	const readPicAsync = (File) => {
+		return new Promise((resolve, reject) => {
+			var reader = new FileReader()
+			var filebuf = []
+			
+			reader.onload = () => {
+				resolve(reader.result);
+			}
+			reader.onerror = reject
 
-	const PostSinglePicForm =  (form) => {
+			reader.readAsArrayBuffer(File)
+			
+		})
+		
+	}
+
+	const PostSinglePicForm =  async(form) => {
 		
 		// var bodyFormData = new FormData()
 		// bodyFormData.append('title', form.form.Title)
@@ -338,59 +353,59 @@ import { fa } from 'element-plus/es/locale'
 		// bodyFormData.append('uploader', form.form.Uploader)
 		// bodyFormData.append('message', form.form.Message)
 		// bodyFormData.append('tags', form.form.Tags)
-		var filebuf = []
 		var ret;
-		var reader = new FileReader()
-		reader.readAsArrayBuffer(form.form.Data)
-		reader.onloadend = (evt) => {
-			if (reader.readyState === FileReader.DONE) {
-				const arrayBuffer = reader.result
-				
-				var array = new Uint8Array(arrayBuffer);
-				for (const a of array) {
-					filebuf.push(a);
-				}
-				// filebuf = array
-				console.log("this is filebuf:"+filebuf)
+		var filebuf = []
 
-				var bodyFormData = {
-					"title":form.form.Title,
-					"file_name":form.form.FileName,
-					"data":filebuf,
-					"uploader":form.form.Uploader,
-					"message":form.form.Message,
-					"tags":form.form.Tags,
-				}
-				
-				
-				console.log(bodyFormData)
-
-				axios({
-					method: "post",
-					url: api.upload,
-					data: bodyFormData,
-					// TODO: maybe add "headers:" in the fulture
-					headers: {
-						"Content-Type": "application/json"
-					}
-				})
-				.then(function (response) {
-					console.log("success+" + response)
-					ret =  true
-				})
-				.catch(function (response) {
-					console.log("err catch+" + response)
-					ret =  false
-				})
+		try {
+			let arrayBuffer = await readPicAsync(form.form.Data)
+			var array = new Uint8Array(arrayBuffer);
+			for (const a of array) {
+				filebuf.push(a);
 			}
-			return ret
+			console.log("测试async filebuf:" + filebuf)
+		} catch (err) {
+			console.log("测试async err:" + err)
 		}
 		
-	}
+		
+		
+		var bodyFormData = {
+			"title":form.form.Title,
+			"file_name":form.form.FileName,
+			"data":filebuf,
+			"uploader":form.form.Uploader,
+			"message":form.form.Message,
+			"tags":form.form.Tags,
+		}
+				
+				
+		console.log(bodyFormData)
 
-	const uploadButtonClick =  () => {
+		axios({
+			method: "post",
+			url: api.upload,
+			data: bodyFormData,
+			// TODO: maybe add "headers:" in the fulture
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+		.then(function (response) {
+			console.log("success+" + response)
+			ret =  true
+		})
+		.catch(function (response) {
+			console.log("err catch+" + response)
+			ret =  false
+		})
+		return ret
+
+	}
+	
+
+	const uploadButtonClick =  async() => {
 		for (var i = 0; i < fileList.value.length; i++) {
-			if ( true ==  PostSinglePicForm(fileList.value[i])) {
+			if ( true == await PostSinglePicForm(fileList.value[i])) {
 				console.log("success upload pic"+i)
 			} else {
 				console.log("fail upload pic"+i)

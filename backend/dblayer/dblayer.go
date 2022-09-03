@@ -42,6 +42,7 @@ func NewRawPicDBController(mongodbURL string) *RawPicDBController {
 }
 
 //TODO:校验图像、压缩过程、使用chacha加密不使用md5在客户端完成
+//FIXME: 图片大于16M时无法插入
 func (c *RawPicDBController) InsertPic(ctx context.Context, pic RawPic) error {
 
 	//开启事务

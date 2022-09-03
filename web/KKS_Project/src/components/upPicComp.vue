@@ -326,10 +326,7 @@ import { fa } from 'element-plus/es/locale'
 		PicIndexSelected.value = 0
 	}
 
-	//FIXME: data中返回的并不是文件的二进制串需要修改，前后端的post需要重新考虑现在无法正确接收,
-	//	通过下面的方法发送后数据库
-								// data
-								// Binary('', 0)
+	//FIXME: 由于reader 和 axios 都是异步的，需要解决异步同步问题，否则无法正常显示发送状态； post的response还没有进行校验
 
 
 	const PostSinglePicForm =  (form) => {
@@ -342,50 +339,53 @@ import { fa } from 'element-plus/es/locale'
 		// bodyFormData.append('message', form.form.Message)
 		// bodyFormData.append('tags', form.form.Tags)
 		var filebuf = []
+		var ret;
 		var reader = new FileReader()
 		reader.readAsArrayBuffer(form.form.Data)
 		reader.onloadend = (evt) => {
-			if (evt.target.readyState === FileReader.DONE) {
-				const arrayBuffer = evt.target.result,
-				array = new Uint8Array(arrayBuffer);
+			if (reader.readyState === FileReader.DONE) {
+				const arrayBuffer = reader.result
+				
+				var array = new Uint8Array(arrayBuffer);
 				for (const a of array) {
 					filebuf.push(a);
 				}
-				console.log(filebuf)
+				// filebuf = array
+				console.log("this is filebuf:"+filebuf)
+
+				var bodyFormData = {
+					"title":form.form.Title,
+					"file_name":form.form.FileName,
+					"data":filebuf,
+					"uploader":form.form.Uploader,
+					"message":form.form.Message,
+					"tags":form.form.Tags,
+				}
+				
+				
+				console.log(bodyFormData)
+
+				axios({
+					method: "post",
+					url: api.upload,
+					data: bodyFormData,
+					// TODO: maybe add "headers:" in the fulture
+					headers: {
+						"Content-Type": "application/json"
+					}
+				})
+				.then(function (response) {
+					console.log("success+" + response)
+					ret =  true
+				})
+				.catch(function (response) {
+					console.log("err catch+" + response)
+					ret =  false
+				})
 			}
-		}
-
-		var bodyFormData = {
-			"title":form.form.Title,
-			"file_name":form.form.FileName,
-			"data":filebuf,
-			"uploader":form.form.Uploader,
-			"message":form.form.Message,
-			"tags":form.form.Tags,
+			return ret
 		}
 		
-		
-		console.log(bodyFormData)
-
-		var ret;
-		axios({
-			method: "post",
-			url: api.upload,
-			data: bodyFormData,
-			// TODO: maybe add "headers:" in the fulture
-			headers: {
-				"Content-Type": "application/json"
-    		}
-		})
-		.then(function (response) {
-			console.log("success+" + response)
-			ret =  true
-		})
-		.catch(function (response) {
-			console.log("err catch+" + response)
-			ret =  false
-		})
-		return ret
 	}
 
 	const uploadButtonClick =  () => {

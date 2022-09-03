@@ -27,16 +27,19 @@
 					<td v-if="file.form.Tags.length <= 0">tags:</td>
 
 					<!-- detail上面的操作按钮 -->
-					<span :class="'detail_button_action'">
+					<span :class="beginUpload==false?'detail_button_action':'detail_button_disabled'">
 						<el-button type="info" :icon="EditPen" circle 
 							@click="EditDetail(index)"
-							:class="'hide_button'"/>
+							:class="'hide_button'"
+							/>
 						<el-button type="info" :icon="Delete" circle 
 							@click="DeleteFile(index)"
-							:class="'hide_button'"/>
+							:class="'hide_button'"
+							/>
 					</span>
 
 				</div>
+				<!-- 上传时显示的进度条界面 -->
 
 				
 			</el-card>
@@ -44,11 +47,11 @@
 		</el-row>
 	</div>
 	
-	<el-button text @click="dialogFormVisible = true">
+	<el-button text @click="dialogFormVisible = true" :disabled="beginUpload">
 		信息修改占位
 	</el-button>
 
-	<el-button text @click="uploadButtonClick">
+	<el-button text @click="uploadButtonClick" :disabled="beginUpload">
 		上传所有
 	</el-button>
 
@@ -89,7 +92,7 @@
 		<el-form :model="form" label-width="140px">
 				
 				<div class="el-upload__tip">
-				        下方属性会赋值给所有图片，如需添加不同属性需要多次填写表单
+				        下方属性会赋值给所有图片，如需添加不同属性需要多次填写表单，图片大小&lt;=16M
 				</div>
 				<el-form-item label="上传者"  required >
 					  <el-input v-model="form.Uploader" placeholder="人人都可以是Karapo"/>
@@ -172,7 +175,6 @@
 	import TagComp from './TagComp.vue'
 	import axios from 'axios'
 	import api from './api_config'
-import { fa } from 'element-plus/es/locale'
 
 	const dialogFormVisible = ref(false)
 	const dialogImageUrl = ref('')
@@ -186,6 +188,9 @@ import { fa } from 'element-plus/es/locale'
 	const fileUrlList = ref<string[]>([])
 	
 	const upload = ref(null)
+
+	// 在开始上传时将所有按钮禁用
+	const beginUpload = ref(false)
 	
 	const form = reactive({
 	  Uploader: '',
@@ -344,7 +349,7 @@ import { fa } from 'element-plus/es/locale'
 		
 	}
 
-	const PostSinglePicForm =  async(form) => {
+	const PostSinglePic =  async(form) => {
 		
 		// var bodyFormData = new FormData()
 		// bodyFormData.append('title', form.form.Title)
@@ -362,9 +367,9 @@ import { fa } from 'element-plus/es/locale'
 			for (const a of array) {
 				filebuf.push(a);
 			}
-			console.log("测试async filebuf:" + filebuf)
+			// console.log("测试async filebuf:" + filebuf)
 		} catch (err) {
-			console.log("测试async err:" + err)
+			console.log("PostSinglePic err:" + err)
 		}
 		
 		
@@ -381,36 +386,45 @@ import { fa } from 'element-plus/es/locale'
 				
 		console.log(bodyFormData)
 
-		axios({
-			method: "post",
-			url: api.upload,
-			data: bodyFormData,
-			// TODO: maybe add "headers:" in the fulture
-			headers: {
-				"Content-Type": "application/json"
-			}
-		})
-		.then(function (response) {
-			console.log("success+" + response)
-			ret =  true
-		})
-		.catch(function (response) {
-			console.log("err catch+" + response)
-			ret =  false
-		})
+		try {
+			await axios({
+				method: "post",
+				url: api.upload,
+				data: bodyFormData,
+				// TODO: maybe add "headers:" in the fulture
+				timeout: 10000,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			}).then(function (response) {
+				console.log("PostPicFormAsync" + response.data)
+				console.log(response.status)
+				console.log(response.data.data)
+				return response
+			})
+			.catch(function (err) {
+				console.log("err catch+" + err)
+			})
+			
+		} catch (err) {
+			console.log("PostPicFormAsync err:" + err)
+		}
 		return ret
 
 	}
 	
 
-	const uploadButtonClick =  async() => {
-		for (var i = 0; i < fileList.value.length; i++) {
-			if ( true == await PostSinglePicForm(fileList.value[i])) {
-				console.log("success upload pic"+i)
-			} else {
-				console.log("fail upload pic"+i)
-			}
-		}
+	const uploadButtonClick = async () => {
+		beginUpload.value = true;
+		// for (var i = 0; i < fileList.value.length; i++) {
+		// 	if ( true == await PostSinglePic(fileList.value[i])) {
+		// 		console.log("success upload pic"+i)
+		// 	} else {
+		// 		console.log("fail upload pic"+i)
+		// 	}
+		// }
+		// beginUpload.value = false;
+
 	}
 
 </script>
@@ -451,6 +465,10 @@ import { fa } from 'element-plus/es/locale'
 
 	.detail_button_action:hover{
 		opacity: 1;
+	}
+
+	.detail_button_disabled{
+		display: none;
 	}
 
 	.detail_button_action{

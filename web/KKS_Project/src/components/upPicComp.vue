@@ -33,7 +33,7 @@
 								@click="EditDetail(index)"
 								:class="'hide_button'"
 								/>
-							<el-button type="info" :icon="Delete" circle 
+							<el-button type="info" :icon="Remove" circle 
 								@click="DeleteFile(index)"
 								:class="'hide_button'"
 								/>
@@ -48,9 +48,11 @@
 						:status="file.uploadStatus"
 						style="opacity:1"
 						>
-							<template :class="file.uploadStatus == 'success' ||
-											file.uploadStatus == 'ready' ? 'progress_off' : 'progressWarning_on'">
-								<span>{{ file.TextBox }}</span>
+							<template :class="file.uploadStatus == 'ready' ? 'progress_off' : 'progressWarning_on'">
+								<el-button  type="success" :icon="Check" circle v-if="file.uploadStatus == 'success'"/>
+								<el-button type="warning" :icon="Warning" circle v-if="file.uploadStatus == 'exception'"/>
+								<el-button type="danger" :icon="Close" circle v-if="file.uploadStatus == 'warning'"/>
+								<span :v-if="file.TextBox!=''"><br/>{{ file.TextBox }}</span>
 							</template>
 						</el-progress>
 					</span>
@@ -60,14 +62,17 @@
 		</el-row>
 	</div>
 	
-	<el-button text @click="dialogFormVisible = true" :disabled="beginUpload">
-		信息修改占位
-	</el-button>
-
-	<el-button text @click="uploadButtonClick" :disabled="beginUpload">
-		上传所有
-	</el-button>
-
+	<el-button-group>
+		<el-button type="primary" :icon="Plus" @click="dialogFormVisible = true" :disabled="beginUpload">
+			添加图片
+		</el-button>
+		<el-button type="primary"  @click="uploadButtonClick" :disabled="beginUpload">
+			上传所有图片
+			<el-icon class="el-icon--right">
+				<Upload />
+			</el-icon>
+		</el-button>
+	</el-button-group>
 
 	<el-dialog 
 		:before-close="closeButtonClick" 
@@ -182,8 +187,8 @@
 	}
 	
 	import { reactive, ref } from 'vue'
-	import {Close, Check,Plus,EditPen,Delete, Position} from '@element-plus/icons-vue'
-	import { UploadProps, UploadUserFile } from 'element-plus'
+	import {Close, Check,Plus,EditPen,Delete, Position,Warning,Remove,Upload} from '@element-plus/icons-vue'
+	import { ElMessageBox, UploadProps, UploadUserFile } from 'element-plus'
 	import { ElMessage } from 'element-plus'
 	import TagComp from './TagComp.vue'
 	import axios from 'axios'
@@ -374,7 +379,6 @@
 		// bodyFormData.append('uploader', form.form.Uploader)
 		// bodyFormData.append('message', form.form.Message)
 		// bodyFormData.append('tags', form.form.Tags)
-		var ret;
 		var filebuf = []
 
 		try {
@@ -400,7 +404,8 @@
 		}
 				
 				
-		console.log(bodyFormData)
+		// console.log(bodyFormData)
+		var ret = false;
 
 		try {
 			await axios({
@@ -413,11 +418,11 @@
 					"Content-Type": "application/json"
 				}
 			}).then(function (response) {
-				console.log("PostPicFormAsync" + response.data)
-				console.log(response.status)
-				console.log(response.data.data)
-				if (response.status == 200) {
-					return true
+				// console.log("PostPicFormAsync" + response.data)
+				// console.log(response.status)
+				// console.log(response.data.data)
+				if (response.data.status) {
+					ret = true
 				}
 			})
 			.catch(function (err) {
@@ -427,13 +432,14 @@
 		} catch (err) {
 			console.log("PostPicFormAsync err:" + err)
 		}
-		return false
+		return ret
 
 	}
 	
 
 	const uploadButtonClick = async () => {
 		beginUpload.value = true;
+		var success_num = 0;
 		for (var i = 0; i < fileList.value.length; i++) {
 			fileList.value[i].percentage = 20
 			fileList.value[i].form.data
@@ -445,31 +451,44 @@
 
 			fileList.value[i].percentage = 40
 
-			if (await PostSinglePic(fileList.value[i]) == true) {
-				fileList.value[i].percentage = 80
-				fileList.value[i].uploadStatus = "success"
-				
-				console.log("success upload pic"+i)
-			} else {
-				fileList.value[i].status = "warning"
-				fileList.value[i].TextBox = "图片上传失败"
-				console.log("fail upload pic"+i)
-			}
-			fileList.value[i].percentage = 100
+			try {
+				var ret = await PostSinglePic(fileList.value[i])
+				if (ret == true) {
+					fileList.value[i].percentage = 80
+					fileList.value[i].uploadStatus = "success"
+					success_num += 1
+					// console.log("success upload pic" + i)
+					fileList.value[i].percentage = 100
+				} else {
+					fileList.value[i].status = "warning"
+					fileList.value[i].TextBox = "图片上传失败"
+					// console.log("fail upload pic" + i)
+				}
 
-		}
-
-		// TODO:在上传完成后删除全部成功的图片
-		var temp = ref<object[]>([])
-		for (var i = 0; i < fileList.value.length; i++) {
-			if (fileList.value[i].status != "success") {
-				temp.value.push(fileList.value[i])
+			} catch (err) {
+				console.log(err)
 			}
 		}
-		fileList.value = temp.value
 
-		// beginUpload.value = false;
-
+		ElMessageBox.confirm(
+			'上传成功' + success_num + '/' + fileList.value.length + '，选择继续上传后上传成功图片将不再显示',
+			'上传结果',
+			{
+				confirmButtonText: '继续上传',
+				type:'info',
+			}
+		).then(function () {
+			// TODO:在上传完成后删除全部成功的图片
+			var temp = ref<object[]>([])
+			for (var i = 0; i < fileList.value.length; i++) {
+				if (fileList.value[i].uploadStatus != "success") {
+					temp.value.push(fileList.value[i])
+				}
+			}
+			// console.log(temp.value)
+			fileList.value = temp.value
+			beginUpload.value = false;
+		})
 	}
 	
 	const checkPicSizeOversize = (file) => {

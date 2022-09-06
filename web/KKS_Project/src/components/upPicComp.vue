@@ -143,7 +143,7 @@
       :on-preview="handlePictureCardPreview"
       :auto-upload="false"
       :multiple="true"
-      ref="upload"
+      ref="uploadComp"
       accept=".jpg,.jpeg,.png,.gif"
     >
       <el-icon><Plus /></el-icon>
@@ -219,7 +219,12 @@ import {
   Remove,
   Upload,
 } from "@element-plus/icons-vue";
-import { ElMessageBox, UploadProps, UploadUserFile } from "element-plus";
+import {
+  ElMessageBox,
+  UploadProps,
+  UploadUserFile,
+  UploadInstance,
+} from "element-plus";
 import { ElMessage } from "element-plus";
 import TagComp from "./TagComp.vue";
 import axios from "axios";
@@ -236,7 +241,7 @@ const tmpfileList = ref<UploadUserFile[]>([]);
 const fileList = ref<any[]>([]);
 const fileUrlList = ref<string[]>([]);
 
-const upload = ref(null);
+const uploadComp = ref<UploadInstance>();
 
 // 在开始上传时将所有按钮禁用
 const beginUpload = ref(false);
@@ -326,14 +331,13 @@ const okButtonClick = () => {
   form.Tags = "";
 
   dialogFormVisible.value = false;
-  if (upload.value != null) {
-    upload.value.clearFiles();
-  }
+
+  uploadComp.value!.clearFiles();
 };
 
 const closeButtonClick = () => {
   dialogFormVisible.value = false;
-  upload.value.clearFiles();
+  uploadComp.value!.clearFiles();
 };
 
 const EditDetail = (index: number) => {
@@ -412,10 +416,11 @@ const PostSinglePic = async (form) => {
   // bodyFormData.append('uploader', form.form.Uploader)
   // bodyFormData.append('message', form.form.Message)
   // bodyFormData.append('tags', form.form.Tags)
-  var filebuf = [];
+  var filebuf: Array<number> = [];
 
   try {
     let arrayBuffer = await readPicAsync(form.form.Data.raw);
+
     var array = new Uint8Array(arrayBuffer);
     for (const a of array) {
       filebuf.push(a);

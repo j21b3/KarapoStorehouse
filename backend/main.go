@@ -17,14 +17,12 @@ import (
 )
 
 // TODO:现版本先只用一个会话连接数据库，后续更新用户管理后每个用户都分配一个
-var RPC *dblayer.RawPicDBController
 
 const timeLimit = 20 * time.Second
 
 func main() {
 	Eng := gin.Default()
 
-	RPC = dblayer.NewRawPicDBController("mongodb://localhost:27017")
 	SetMiddleware(Eng)
 	SetRoutes(Eng)
 	Eng.Run(":25790")
@@ -48,6 +46,7 @@ func GetRawPic(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeLimit)
 	defer cancel()
 
+	RPC := dblayer.NewRawPicDBController("mongodb://localhost:27017")
 	data, err := RPC.FindPicById(ctx, pidstr)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, model.ReturnData{
@@ -84,6 +83,8 @@ func GetPicDetail(c *gin.Context) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeLimit)
 	defer cancel()
+
+	RPC := dblayer.NewRawPicDBController("mongodb://localhost:27017")
 
 	data, err := RPC.FindDetailById(ctx, form.Pid)
 	if err != nil {
@@ -133,6 +134,8 @@ func UploadRawPic(c *gin.Context) {
 	//TODO:后续需要校验data内容
 	ctx, cancel := context.WithTimeout(context.Background(), timeLimit)
 	defer cancel()
+
+	RPC := dblayer.NewRawPicDBController("mongodb://localhost:27017")
 	id := RPC.GenerateID()
 	err := RPC.InsertPic(ctx, dblayer.RawPic{
 		Id:         id,
@@ -177,6 +180,8 @@ func GetThumbnailPic(c *gin.Context) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeLimit)
 	defer cancel()
+
+	RPC := dblayer.NewRawPicDBController("mongodb://localhost:27017")
 
 	data, err := RPC.FindPicById(ctx, form.Pid)
 	if err != nil {
@@ -236,6 +241,8 @@ func GetTimeline(c *gin.Context) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeLimit)
 	defer cancel()
+
+	RPC := dblayer.NewRawPicDBController("mongodb://localhost:27017")
 
 	ret, err := RPC.GetTimelineID(ctx, page)
 	if err != nil {

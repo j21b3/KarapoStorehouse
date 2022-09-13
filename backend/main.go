@@ -219,14 +219,15 @@ func GetThumbnailPic(c *gin.Context) {
 		return
 	}
 	//TODO:后续需要调整为协议内容
-	//c.Writer.WriteString(string(thumbnailData))
-	c.JSON(http.StatusOK, model.ReturnData{
-		Status: true,
-		Data:   thumbnailData,
-	})
+	c.Writer.WriteString(string(thumbnailData))
+	// c.JSON(http.StatusOK, model.ReturnData{
+	// 	Status: true,
+	// 	Data:   thumbnailData,
+	// })
 }
 
 // GET http://127.0.0.1:25790/timeline/(0,int64max)
+// 如果没有更多元素了就返回空
 func GetTimeline(c *gin.Context) {
 	pageStr := c.Param("page")
 	page, err := strconv.ParseInt(pageStr, 10, 64)

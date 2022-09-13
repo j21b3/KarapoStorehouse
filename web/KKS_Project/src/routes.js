@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory ,} from 'vue-router'
 
 const routes=[
 	{
@@ -17,6 +17,10 @@ const routes=[
 		path:'/uploadpic',
 		component: () => import('./components/uploadPicPage.vue')
 	},
+	{
+		path: '/timeline',
+		component: () => import('./components/TimelinePage.vue')
+	}
 ]
 
 
